@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 export default function Index() {
   return (
@@ -9,15 +9,19 @@ export default function Index() {
       <Link href="/notifications" style={styles.link}>
         Show notifications
       </Link>
+      <Link href="/settings" style={styles.link}>
+        Settings
+      </Link>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   view: {
-    backgroundColor: "#262626",
+    backgroundColor: "#181818",
     flex: 1,
     justifyContent: "center",
+    gap: 12,
     alignItems: "center",
   },
   link: {

@@ -113,23 +113,7 @@ const Notification: React.FC<INotificationProps> = ({
 };
 
 export default function NotificationView() {
-  const [hasPermission, setHasPermission] = useState(false);
   const [lastNotification, setLastNotification] = useState<any>(null);
-
-  const handleOnPressPermissionButton = async () => {
-    /**
-     * Open the notification settings so the user
-     * so the user can enable it
-     */
-    RNAndroidNotificationListener.requestPermission();
-  };
-
-  const handleAppStateChange = async (nextAppState: string, force = false) => {
-    if (nextAppState === "active" || (force && RNAndroidNotificationListener)) {
-      const status = await RNAndroidNotificationListener.getPermissionStatus();
-      setHasPermission(status !== "denied");
-    }
-  };
 
   const handleCheckNotificationInterval = async () => {
     const lastStoredNotification = await AsyncStorage.getItem(
@@ -137,10 +121,6 @@ export default function NotificationView() {
     );
 
     if (lastStoredNotification) {
-      /**
-       * As the notification is a JSON string,
-       * here I just parse it
-       */
       setLastNotification(JSON.parse(lastStoredNotification));
     }
   };
@@ -155,13 +135,8 @@ export default function NotificationView() {
      */
     interval = setInterval(handleCheckNotificationInterval, 3000);
 
-    const listener = AppState.addEventListener("change", handleAppStateChange);
-
-    handleAppStateChange("", true);
-
     return () => {
       clearInterval(interval);
-      listener.remove();
     };
   }, []);
 
@@ -172,23 +147,6 @@ export default function NotificationView() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.buttonWrapper}>
-        <Text
-          style={[
-            styles.permissionStatus,
-            { color: hasPermission ? "green" : "red" },
-          ]}
-        >
-          {hasPermission
-            ? "Allowed to handle notifications"
-            : "NOT allowed to handle notifications"}
-        </Text>
-        <Button
-          title="Open Configuration"
-          onPress={handleOnPressPermissionButton}
-          disabled={hasPermission}
-        />
-      </View>
       <View style={styles.notificationsWrapper}>
         {lastNotification && !hasGroupedMessages && (
           <ScrollView style={styles.scrollView}>
@@ -217,10 +175,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#181818",
-  },
-  permissionStatus: {
-    marginBottom: 20,
-    fontSize: 18,
   },
   notificationsWrapper: {
     flex: 1,
@@ -271,11 +225,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     resizeMode: "contain",
-  },
-  buttonWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 50,
   },
   scrollView: {
     flex: 1,
