@@ -49,7 +49,7 @@ export default function RootLayout() {
               }}
             />
           <Stack.Screen
-            name="notifications"
+              name="notifications/index"
               options={{
                 title: "Notifications",
                 headerStyle: { backgroundColor: "#2b2b2b" },
