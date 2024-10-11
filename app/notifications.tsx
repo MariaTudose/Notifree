@@ -1,19 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  SafeAreaView,
-  Text,
-  Image,
-  Button,
-  AppState,
-  View,
-  FlatList,
-  ScrollView,
-  Dimensions,
-  StyleSheet,
-} from "react-native";
-import RNAndroidNotificationListener from "react-native-android-notification-listener";
-
+import { FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as S from "./styles";
 
 let interval: any = null;
 
@@ -51,64 +39,49 @@ const Notification: React.FC<INotificationProps> = ({
   iconLarge,
 }) => {
   return (
-    <View style={styles.notificationWrapper}>
-      <View style={styles.notification}>
-        <View style={styles.imagesWrapper}>
+    <S.NotificationWrapper>
+      <S.Notification>
+        <S.ImageWrapper>
           {!!icon && (
-            <View style={styles.notificationIconWrapper}>
-              <Image source={{ uri: icon }} style={styles.notificationIcon} />
-            </View>
+            <S.IconWrapper>
+              <S.Icon source={{ uri: icon }} />
+            </S.IconWrapper>
           )}
-
           {!!image && (
-            <View style={styles.notificationImageWrapper}>
-              <Image source={{ uri: image }} style={styles.notificationImage} />
-            </View>
+            <S.IconWrapper>
+              <S.Icon source={{ uri: image }} />
+            </S.IconWrapper>
           )}
           {!!iconLarge && (
-            <View style={styles.notificationImageWrapper}>
-              <Image
-                source={{ uri: iconLarge }}
-                style={styles.notificationImage}
-              />
-            </View>
+            <S.IconWrapper>
+              <S.Icon source={{ uri: iconLarge }} />
+            </S.IconWrapper>
           )}
-        </View>
-        <View style={styles.notificationInfoWrapper}>
-          <Text style={styles.textInfo}>{`app: ${app}`}</Text>
-          <Text style={styles.textInfo}>{`title: ${title}`}</Text>
-          <Text style={styles.textInfo}>{`text: ${text}`}</Text>
-          {!!time && <Text style={styles.textInfo}>{`time: ${time}`}</Text>}
-          {!!titleBig && (
-            <Text style={styles.textInfo}>{`titleBig: ${titleBig}`}</Text>
-          )}
-          {!!subText && (
-            <Text style={styles.textInfo}>{`subText: ${subText}`}</Text>
-          )}
+        </S.ImageWrapper>
+        <S.InfoWrapper>
+          <S.InfoText>{`app: ${app}`}</S.InfoText>
+          <S.InfoText>{`title: ${title}`}</S.InfoText>
+          <S.InfoText>{`text: ${text}`}</S.InfoText>
+
+          {!!time && <S.InfoText>{`time: ${time}`}</S.InfoText>}
+          {!!titleBig && <S.InfoText>{`titleBig: ${titleBig}`}</S.InfoText>}
+          {!!subText && <S.InfoText>{`subText: ${subText}`}</S.InfoText>}
           {!!summaryText && (
-            <Text style={styles.textInfo}>{`summaryText: ${summaryText}`}</Text>
+            <S.InfoText>{`summaryText: ${summaryText}`}</S.InfoText>
           )}
-          {!!bigText && (
-            <Text style={styles.textInfo}>{`bigText: ${bigText}`}</Text>
-          )}
+          {!!bigText && <S.InfoText>{`bigText: ${bigText}`}</S.InfoText>}
           {!!audioContentsURI && (
-            <Text
-              style={styles.textInfo}
-            >{`audioContentsURI: ${audioContentsURI}`}</Text>
+            <S.InfoText>{`audioContentsURI: ${audioContentsURI}`}</S.InfoText>
           )}
           {!!imageBackgroundURI && (
-            <Text
-              style={styles.textInfo}
-            >{`imageBackgroundURI: ${imageBackgroundURI}`}</Text>
+            <S.InfoText>{`imageBackgroundURI: ${imageBackgroundURI}`}</S.InfoText>
           )}
           {!!extraInfoText && (
-            <Text
-              style={styles.textInfo}
-            >{`extraInfoText: ${extraInfoText}`}</Text>
+            <S.InfoText>{`extraInfoText: ${extraInfoText}`}</S.InfoText>
           )}
-        </View>
-      </View>
-    </View>
+        </S.InfoWrapper>
+      </S.Notification>
+    </S.NotificationWrapper>
   );
 };
 
@@ -127,13 +100,8 @@ export default function NotificationView() {
 
   useEffect(() => {
     clearInterval(interval);
-
-    /**
-     * Just setting a interval to check if
-     * there is a notification in AsyncStorage
-     * so I can show it in the application
-     */
-    interval = setInterval(handleCheckNotificationInterval, 3000);
+    handleCheckNotificationInterval();
+    interval = setInterval(handleCheckNotificationInterval, 5000);
 
     return () => {
       clearInterval(interval);
@@ -146,12 +114,12 @@ export default function NotificationView() {
     lastNotification.groupedMessages.length > 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.notificationsWrapper}>
+    <S.MainView>
+      <S.NotificationsWrapper>
         {lastNotification && !hasGroupedMessages && (
-          <ScrollView style={styles.scrollView}>
+          <S.ScrollableView>
             <Notification {...lastNotification} />
-          </ScrollView>
+          </S.ScrollableView>
         )}
         {lastNotification && hasGroupedMessages && (
           <FlatList
@@ -162,74 +130,7 @@ export default function NotificationView() {
             )}
           />
         )}
-      </View>
-    </SafeAreaView>
+      </S.NotificationsWrapper>
+    </S.MainView>
   );
 }
-
-const { width } = Dimensions.get("screen");
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#181818",
-  },
-  notificationsWrapper: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  notificationWrapper: {
-    flexDirection: "column",
-    width: width * 0.8,
-    backgroundColor: "#262626",
-    padding: 20,
-    marginTop: 20,
-    borderRadius: 5,
-    elevation: 2,
-  },
-  notification: {
-    flexDirection: "row",
-  },
-  imagesWrapper: {
-    flexDirection: "column",
-  },
-  notificationInfoWrapper: {
-    flex: 1,
-  },
-  notificationIconWrapper: {
-    backgroundColor: "#aaa",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: "center",
-    marginRight: 15,
-    justifyContent: "center",
-  },
-  notificationIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: "contain",
-  },
-  notificationImageWrapper: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: "center",
-    marginRight: 15,
-    justifyContent: "center",
-  },
-  notificationImage: {
-    width: 40,
-    height: 40,
-    resizeMode: "contain",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  textInfo: {
-    color: "#fff",
-  },
-});

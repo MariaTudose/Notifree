@@ -1,9 +1,7 @@
+import { NativeTheme, theme } from "@/constants/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  ThemeProvider,
-  DarkTheme,
-  DefaultTheme,
-} from "@react-navigation/native";
+import { ThemeProvider as NativeThemeProvider } from "@react-navigation/native";
+import { ThemeProvider } from "styled-components";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -40,17 +38,33 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#181818" }}>
-      <ThemeProvider value={DarkTheme}>
+    <View style={{ flex: 1, backgroundColor: "#2b2b2b" }}>
+      <NativeThemeProvider value={NativeTheme}>
+        <ThemeProvider theme={theme}>
         <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+              }}
+            />
           <Stack.Screen
             name="notifications"
-            options={{ title: "Notifications" }}
+              options={{
+                title: "Notifications",
+                headerStyle: { backgroundColor: "#2b2b2b" },
+              }}
           />
-          <Stack.Screen name="settings" options={{ title: "Settings" }} />
+            <Stack.Screen
+              name="settings"
+              options={{
+                title: "Settings",
+                headerStyle: { backgroundColor: "#2b2b2b" },
+              }}
+            />
         </Stack>
       </ThemeProvider>
+      </NativeThemeProvider>
     </View>
   );
 }

@@ -1,8 +1,25 @@
-import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, AppState } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RNAndroidNotificationListener from "react-native-android-notification-listener";
+import styled from "styled-components";
+
+const MainContainer = styled(SafeAreaView)`
+  flex: 1;
+  background-color: ${(props) => props.theme.background};
+`;
+
+const PermissionText = styled(Text)<{ hasPermission: boolean }>`
+  color: ${(props) => (props.hasPermission ? "green" : "red")};
+  margin-bottom: 20px;
+  font-size: 18px;
+`;
+
+const ButtonWrapper = styled(View)`
+  justify-content: center;
+  align-items: center;
+  padding: 0px 50px;
+`;
 
 export default function Settings() {
   const [hasPermission, setHasPermission] = useState(false);
@@ -33,40 +50,19 @@ export default function Settings() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.buttonWrapper}>
-        <Text
-          style={[
-            styles.permissionStatus,
-            { color: hasPermission ? "green" : "red" },
-          ]}
-        >
+    <MainContainer>
+      <ButtonWrapper>
+        <PermissionText hasPermission={hasPermission}>
           {hasPermission
             ? "Allowed to handle notifications"
             : "NOT allowed to handle notifications"}
-        </Text>
+        </PermissionText>
         <Button
           title="Open Configuration"
           onPress={handleOnPressPermissionButton}
           disabled={hasPermission}
         />
-      </View>
-    </SafeAreaView>
+      </ButtonWrapper>
+    </MainContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#181818",
-  },
-  permissionStatus: {
-    marginBottom: 20,
-    fontSize: 18,
-  },
-  buttonWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 50,
-  },
-});
