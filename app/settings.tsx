@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, AppState } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import RNAndroidNotificationListener from "react-native-android-notification-listener";
-import styled from "styled-components";
+import { useEffect, useState } from 'react';
+import { View, Text, Button, AppState } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import RNAndroidNotificationListener from 'react-native-android-notification-listener';
+import styled from 'styled-components';
 
 const MainContainer = styled(SafeAreaView)`
   flex: 1;
-  background-color: ${(props) => props.theme.background};
+  background-color: ${props => props.theme.background};
 `;
 
 const PermissionText = styled(Text)<{ hasPermission: boolean }>`
-  color: ${(props) => (props.hasPermission ? "green" : "red")};
+  color: ${props => (props.hasPermission ? 'green' : 'red')};
   margin-bottom: 20px;
   font-size: 18px;
 `;
@@ -33,16 +33,16 @@ export default function Settings() {
   };
 
   const handleAppStateChange = async (nextAppState: string, force = false) => {
-    if (nextAppState === "active" || (force && RNAndroidNotificationListener)) {
+    if (nextAppState === 'active' || (force && RNAndroidNotificationListener)) {
       const status = await RNAndroidNotificationListener.getPermissionStatus();
-      setHasPermission(status !== "denied");
+      setHasPermission(status !== 'denied');
     }
   };
 
   useEffect(() => {
-    const listener = AppState.addEventListener("change", handleAppStateChange);
+    const listener = AppState.addEventListener('change', handleAppStateChange);
 
-    handleAppStateChange("", true);
+    handleAppStateChange('', true);
 
     return () => {
       listener.remove();
@@ -53,15 +53,9 @@ export default function Settings() {
     <MainContainer>
       <ButtonWrapper>
         <PermissionText hasPermission={hasPermission}>
-          {hasPermission
-            ? "Allowed to handle notifications"
-            : "NOT allowed to handle notifications"}
+          {hasPermission ? 'Allowed to handle notifications' : 'NOT allowed to handle notifications'}
         </PermissionText>
-        <Button
-          title="Open Configuration"
-          onPress={handleOnPressPermissionButton}
-          disabled={hasPermission}
-        />
+        <Button title="Open Configuration" onPress={handleOnPressPermissionButton} disabled={hasPermission} />
       </ButtonWrapper>
     </MainContainer>
   );

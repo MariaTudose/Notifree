@@ -1,38 +1,55 @@
-import { SafeAreaView, View, Text, Image, ScrollView } from "react-native";
-import styled from "styled-components";
+import { SafeAreaView, View, Text, Image } from 'react-native';
+import styled from 'styled-components';
 
 export const NotificationWrapper = styled(SafeAreaView)`
-  flex-direction: column;
-  width: width;
   background-color: ${({ theme }) => theme.card};
   padding: 20px;
-  margin: 16px;
+  margin: 4px 16px;
   border-radius: 18px;
-  flex: 1;
+`;
+
+export const NotificationHeader = styled(View)`
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+`;
+
+export const AppLabel = styled(Text)`
+  color: ${({ theme }) => theme.text};
+  text-transform: capitalize;
+`;
+
+export const InfoTitle = styled(Text)`
+  color: ${({ theme }) => theme.text};
+  flex-shrink: 1;
 `;
 
 export const Notification = styled(View)`
+  margin-top: 8px;
   flex-direction: row;
   flex-wrap: nowrap;
+  align-items: center;
 `;
 
 export const ImageWrapper = styled(View)`
-  flex-direction: "column";
+  flex-direction: 'column';
 `;
 
 export const IconWrapper = styled(View)`
-  background-color: #aaa;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-  align-items: center;
-  margin-right: 15px;
-  justify-content: center;
+  width: 15px;
+  height: 15px;
 `;
 
 export const Icon = styled(Image)`
-  width: 30px;
-  height: 30px;
+  width: 15px;
+  height: 15px;
+`;
+
+export const BigIcon = styled(Image)`
+  width: 35px;
+  height: 35px;
+  margin-right: 8px;
 `;
 
 export const InfoWrapper = styled(View)`
@@ -49,9 +66,5 @@ export const MainView = styled(View)`
 `;
 
 export const NotificationsWrapper = styled(View)`
-  flex: 1;
-`;
-
-export const ScrollableView = styled(ScrollView)`
   flex: 1;
 `;

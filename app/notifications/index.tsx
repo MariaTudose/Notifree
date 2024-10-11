@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { FlatList } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as S from "./styles";
+import React, { useState, useEffect } from 'react';
+import { FlatList, Pressable } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { InstalledApps, RNLauncherKitHelper } from 'react-native-launcher-kit';
+import { AppDetail } from 'react-native-launcher-kit/typescript/Interfaces/InstalledApps';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+import * as S from './styles';
+
+dayjs.extend(relativeTime);
 
 let interval: any = null;
+const apps = InstalledApps.getApps();
 
-interface INotificationProps {
+type SubNotification = {
+  title: string;
+  text: string;
+};
+
+type Notification = {
   time: string;
   app: string;
   title: string;
@@ -20,81 +33,74 @@ interface INotificationProps {
   icon: string;
   image: string;
   iconLarge: string;
-}
+  groupedMessages: SubNotification[];
+};
 
-const Notification: React.FC<INotificationProps> = ({
-  time,
-  app,
-  title,
-  titleBig,
-  text,
-  subText,
-  summaryText,
-  bigText,
-  audioContentsURI,
-  imageBackgroundURI,
-  extraInfoText,
-  icon,
-  image,
-  iconLarge,
-}) => {
+const getIcon = (primary: string, secondary: AppDetail | undefined) => {
+  if (primary) {
+    return <S.Icon source={{ uri: primary }} />;
+  } else if (secondary && secondary.icon) {
+    return <S.Icon source={{ uri: `data:image/png;base64,${secondary.icon}` }} />;
+  }
+};
+
+const Notification = ({ app, notifs }: { app: string; notifs: Notification[] }) => {
+  const groupByUser = (notifs: Notification[]) => {
+    const grouped = notifs.reduce((res: Record<string, Notification[]>, n) => {
+      (res[n.title] = res[n.title] || []).push(n);
+      return res;
+    }, {});
+    return grouped;
+  };
+
   return (
-    <S.NotificationWrapper>
-      <S.Notification>
-        <S.ImageWrapper>
-          {!!icon && (
-            <S.IconWrapper>
-              <S.Icon source={{ uri: icon }} />
-            </S.IconWrapper>
-          )}
-          {!!image && (
-            <S.IconWrapper>
-              <S.Icon source={{ uri: image }} />
-            </S.IconWrapper>
-          )}
-          {!!iconLarge && (
-            <S.IconWrapper>
-              <S.Icon source={{ uri: iconLarge }} />
-            </S.IconWrapper>
-          )}
-        </S.ImageWrapper>
-        <S.InfoWrapper>
-          <S.InfoText>{`app: ${app}`}</S.InfoText>
-          <S.InfoText>{`title: ${title}`}</S.InfoText>
-          <S.InfoText>{`text: ${text}`}</S.InfoText>
-
-          {!!time && <S.InfoText>{`time: ${time}`}</S.InfoText>}
-          {!!titleBig && <S.InfoText>{`titleBig: ${titleBig}`}</S.InfoText>}
-          {!!subText && <S.InfoText>{`subText: ${subText}`}</S.InfoText>}
-          {!!summaryText && (
-            <S.InfoText>{`summaryText: ${summaryText}`}</S.InfoText>
-          )}
-          {!!bigText && <S.InfoText>{`bigText: ${bigText}`}</S.InfoText>}
-          {!!audioContentsURI && (
-            <S.InfoText>{`audioContentsURI: ${audioContentsURI}`}</S.InfoText>
-          )}
-          {!!imageBackgroundURI && (
-            <S.InfoText>{`imageBackgroundURI: ${imageBackgroundURI}`}</S.InfoText>
-          )}
-          {!!extraInfoText && (
-            <S.InfoText>{`extraInfoText: ${extraInfoText}`}</S.InfoText>
-          )}
-        </S.InfoWrapper>
-      </S.Notification>
-    </S.NotificationWrapper>
+    <Pressable onPress={() => RNLauncherKitHelper.launchApplication(app)}>
+      {Object.values(groupByUser(notifs)).map(userNotifs => {
+        const { title, icon, image, iconLarge, time } = userNotifs[userNotifs.length - 1];
+        const installedApp = apps.find(ap => ap.packageName === app);
+        const mostRecentTime = Math.max(...userNotifs.map(n => Number(n.time)));
+        const timeDiff = dayjs(mostRecentTime).fromNow(true);
+        return (
+          <S.NotificationWrapper key={time}>
+            <S.NotificationHeader>
+              {getIcon(icon, installedApp)}
+              <S.AppLabel>{installedApp?.label} -</S.AppLabel>
+              <S.InfoTitle ellipsizeMode="tail" numberOfLines={1}>
+                {title} -
+              </S.InfoTitle>
+              <S.InfoText>{timeDiff}</S.InfoText>
+            </S.NotificationHeader>
+            <S.Notification>
+              <S.ImageWrapper>
+                {!!image && <S.BigIcon source={{ uri: image }} />}
+                {!!iconLarge && (
+                  <S.BigIcon
+                    source={{
+                      uri: iconLarge,
+                    }}
+                  />
+                )}
+              </S.ImageWrapper>
+              <S.InfoWrapper>
+                {userNotifs.map(notif => (
+                  <S.InfoText key={notif.time}>{notif.text}</S.InfoText>
+                ))}
+              </S.InfoWrapper>
+            </S.Notification>
+          </S.NotificationWrapper>
+        );
+      })}
+    </Pressable>
   );
 };
 
 export default function NotificationView() {
-  const [lastNotification, setLastNotification] = useState<any>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const handleCheckNotificationInterval = async () => {
-    const lastStoredNotification = await AsyncStorage.getItem(
-      "@lastNotification"
-    );
-
-    if (lastStoredNotification) {
-      setLastNotification(JSON.parse(lastStoredNotification));
+    const storedNotifications = await AsyncStorage.getItem('notifications');
+    if (storedNotifications) {
+      setNotifications(JSON.parse(storedNotifications));
     }
   };
 
@@ -108,28 +114,26 @@ export default function NotificationView() {
     };
   }, []);
 
-  const hasGroupedMessages =
-    lastNotification &&
-    lastNotification.groupedMessages &&
-    lastNotification.groupedMessages.length > 0;
+  const processNotifications = (notifs: Notification[]) => {
+    const filtered = notifs.filter((value, index, self) => index === self.findIndex(t => t.text === value.text));
+    const sorted = filtered.sort((a: Notification, b: Notification) => (a.time < b.time ? 1 : -1));
+    const grouped = sorted.reduce((res: Record<string, Notification[]>, n) => {
+      (res[n.app] = res[n.app] || []).push(n);
+      return res;
+    }, {});
+    return grouped;
+  };
 
   return (
     <S.MainView>
       <S.NotificationsWrapper>
-        {lastNotification && !hasGroupedMessages && (
-          <S.ScrollableView>
-            <Notification {...lastNotification} />
-          </S.ScrollableView>
-        )}
-        {lastNotification && hasGroupedMessages && (
-          <FlatList
-            data={lastNotification.groupedMessages}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item }) => (
-              <Notification app={lastNotification.app} {...item} />
-            )}
-          />
-        )}
+        <FlatList
+          data={Object.entries(processNotifications(notifications))}
+          renderItem={({ item }) => {
+            const [app, notification] = item;
+            return <Notification app={app} notifs={notification}></Notification>;
+          }}
+        />
       </S.NotificationsWrapper>
     </S.MainView>
   );

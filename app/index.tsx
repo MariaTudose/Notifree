@@ -1,6 +1,6 @@
-import { Link } from "expo-router";
-import { SafeAreaView } from "react-native";
-import styled from "styled-components";
+import { Link } from 'expo-router';
+import { SafeAreaView } from 'react-native';
+import styled from 'styled-components';
 
 const MainContainer = styled(SafeAreaView)`
   background-color: #2b2b2b;
