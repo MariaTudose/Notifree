@@ -1,4 +1,4 @@
-package com.bepou.NotificationBox
+package com.bepo.notifree
 
 import android.app.Application
 import android.content.res.Configuration
@@ -14,6 +14,8 @@ import com.facebook.soloader.SoLoader
 
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
+
+import android.database.CursorWindow;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -45,6 +47,14 @@ class MainApplication : Application(), ReactApplication {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       load()
     }
+    try {
+      val field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+      field.isAccessible = true
+      field.set(null, 100 * 1024 * 1024);
+    } catch (e: Exception) {
+      e.printStackTrace();
+    }
+   
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
   }
 
