@@ -55,26 +55,38 @@ export const NotificationItem = ({ app, notifs, removeNotifs }: NotificationItem
           >
             <Pressable onPress={() => () => RNLauncherKitHelper.launchApplication(app)}>
               <S.NotificationWrapper>
-            <S.NotificationHeader>
-              {getIcon(icon, installedApp)}
-              <S.AppLabel>{installedApp?.label} -</S.AppLabel>
-              <S.InfoTitle ellipsizeMode="tail" numberOfLines={1}>
-                {title}
-              </S.InfoTitle>
-              <S.InfoText>- {timeDiff}</S.InfoText>
-            </S.NotificationHeader>
-            <S.Notification>
-              <S.ImageWrapper>
-                {!!image && <S.BigIcon source={{ uri: image }} />}
-                {!!iconLarge && <S.BigIcon source={{ uri: iconLarge }} />}
-              </S.ImageWrapper>
-              <S.InfoWrapper>
-                {userNotifs.map(notif => (
-                  <S.InfoText key={notif.key}>{notif.text}</S.InfoText>
-                ))}
-              </S.InfoWrapper>
-            </S.Notification>
-          </S.NotificationWrapper>
+                <S.NotificationHeader>
+                  {getIcon(icon, installedApp)}
+                  <S.AppLabel>{installedApp?.label} -</S.AppLabel>
+                  <S.InfoTitle ellipsizeMode="tail" numberOfLines={1}>
+                    {title}
+                  </S.InfoTitle>
+                  <S.InfoText>- {timeDiff}</S.InfoText>
+                </S.NotificationHeader>
+                <S.Notification>
+                  <S.ImageWrapper>
+                    {!!image && <S.BigIcon source={{ uri: image }} />}
+                    {!!iconLarge && <S.BigIcon source={{ uri: iconLarge }} />}
+                  </S.ImageWrapper>
+                  <S.InfoWrapper>
+                    {userNotifs.map(notif => {
+                      if (notif.groupedMessages.length > 0) {
+                        return (
+                          <React.Fragment key={notif.key}>
+                            {notif.groupedMessages.map((msg, i) => (
+                              <S.InfoText key={i}>
+                                {msg.title} - {msg.text}
+                              </S.InfoText>
+                            ))}
+                          </React.Fragment>
+                        );
+                      } else {
+                        return <S.InfoText key={notif.key}>{notif.text}</S.InfoText>;
+                      }
+                    })}
+                  </S.InfoWrapper>
+                </S.Notification>
+              </S.NotificationWrapper>
             </Pressable>
           </Interactable.View>
         );
