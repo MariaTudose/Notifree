@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Notification } from '@/types/Notification';
 
 export const headlessNotificationListener = async ({ notification }: any) => {
   if (notification) {

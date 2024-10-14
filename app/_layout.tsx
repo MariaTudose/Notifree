@@ -5,8 +5,9 @@ import { ThemeProvider } from 'styled-components';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
-import { AppRegistry, View } from 'react-native';
+import { AppRegistry } from 'react-native';
 import { RNAndroidNotificationListenerHeadlessJsName } from 'react-native-android-notification-listener';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { headlessNotificationListener } from '@/utils/notificationListener';
 
 // Register notification listener
@@ -31,7 +32,7 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#2b2b2b' }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#2b2b2b' }}>
       <NativeThemeProvider value={NativeTheme}>
         <ThemeProvider theme={theme}>
           <Stack>
@@ -58,6 +59,6 @@ export default function RootLayout() {
           </Stack>
         </ThemeProvider>
       </NativeThemeProvider>
-    </View>
+    </GestureHandlerRootView>
   );
 }

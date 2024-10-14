@@ -33,7 +33,7 @@ export const Notification = styled(View)`
 `;
 
 export const ImageWrapper = styled(View)`
-  flex-direction: 'column';
+  flex-direction: column;
 `;
 
 export const IconWrapper = styled(View)`

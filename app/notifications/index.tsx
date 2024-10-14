@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollView } from 'react-native-gesture-handler';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { Notification } from '@/types/Notification';
 
-import { NotificationItem, Notification } from './Notification';
+import { NotificationItem } from './Notification';
 
 import * as S from './styles';
 
@@ -32,6 +33,16 @@ export default function NotificationView() {
     };
   }, []);
 
+  const removeNotifs = async (userNotifs: Notification[]) => {
+    setNotifications(prevNotifications => {
+      const newNotifs = prevNotifications.filter(notif => {
+        return !userNotifs.find(userNotif => userNotif.key === notif.key);
+      });
+      AsyncStorage.setItem('notifications', JSON.stringify(newNotifs));
+      return newNotifs;
+    });
+  };
+
   const processNotifications = (notifs: Notification[]) => {
     const sorted = notifs.sort((a: Notification, b: Notification) => (a.time < b.time ? 1 : -1));
     const grouped = sorted.reduce((res: Record<string, Notification[]>, n) => {
@@ -44,13 +55,11 @@ export default function NotificationView() {
   return (
     <S.MainView>
       <S.NotificationsWrapper>
-        <FlatList
-          data={Object.entries(processNotifications(notifications))}
-          renderItem={({ item }) => {
-            const [app, notification] = item;
-            return <NotificationItem app={app} notifs={notification}></Notification>;
-          }}
-        />
+        <ScrollView>
+          {Object.entries(processNotifications(notifications)).map(([app, notification]) => {
+            return <NotificationItem key={app} app={app} notifs={notification} removeNotifs={removeNotifs} />;
+          })}
+        </ScrollView>
       </S.NotificationsWrapper>
     </S.MainView>
   );
