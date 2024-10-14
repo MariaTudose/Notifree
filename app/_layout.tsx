@@ -1,5 +1,4 @@
 import { NativeTheme, theme } from '@/constants/theme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider as NativeThemeProvider } from '@react-navigation/native';
 import { ThemeProvider } from 'styled-components';
 import { useFonts } from 'expo-font';

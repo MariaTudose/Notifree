@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Notification } from '@/types/Notification';
 
-import { NotificationItem } from './Notification';
+import { NotificationItem } from './NotificationItem';
 
 import * as S from './styles';
 
