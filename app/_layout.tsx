@@ -7,16 +7,28 @@ import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { AppRegistry, View } from 'react-native';
 import { RNAndroidNotificationListenerHeadlessJsName } from 'react-native-android-notification-listener';
+import { Notification } from './notifications/Notification';
 
 const headlessNotificationListener = async ({ notification }: any) => {
   if (notification) {
     AsyncStorage.getItem('notifications')
-      .then(req => {
-        if (req) return JSON.parse(req);
+      .then(res => {
+        if (res) return JSON.parse(res);
         else return [];
       })
-      .then(array => {
-        AsyncStorage.setItem('notifications', JSON.stringify([...array, JSON.parse(notification)]));
+      .then(currentNotifs => {
+        let newNotifs = [];
+        const parsedNotif = JSON.parse(notification);
+        const prevNotifIndex = currentNotifs.findIndex((notif: Notification) => notif.key === parsedNotif.key);
+        if (prevNotifIndex > 0) {
+          // If notification with key exists, overwrite it with the new one
+          currentNotifs[prevNotifIndex] = parsedNotif;
+          newNotifs = currentNotifs;
+        } else {
+          // Otherwise add the new notification normally
+          newNotifs = [...currentNotifs, parsedNotif];
+        }
+        AsyncStorage.setItem('notifications', JSON.stringify(newNotifs));
       })
       .catch(error => console.log(error));
   }

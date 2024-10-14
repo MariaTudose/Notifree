@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-android-notification-listener/android/src/main/java/com/lesimoes/androidnotificationlistener/RNNotification.java b/node_modules/react-native-android-notification-listener/android/src/main/java/com/lesimoes/androidnotificationlistener/RNNotification.java
+index 79a17f9..d181394 100644
+--- a/node_modules/react-native-android-notification-listener/android/src/main/java/com/lesimoes/androidnotificationlistener/RNNotification.java
++++ b/node_modules/react-native-android-notification-listener/android/src/main/java/com/lesimoes/androidnotificationlistener/RNNotification.java
+@@ -20,6 +20,7 @@ import android.graphics.drawable.BitmapDrawable;
+ public class RNNotification {
+     private static final String TAG = "RNAndroidNotificationListener";
+ 
++    protected String key;
+     protected String app;
+     protected String title;
+     protected String titleBig;
+@@ -41,6 +42,7 @@ public class RNNotification {
+         if (notification != null && notification.extras != null) {
+             String packageName = sbn.getPackageName();
+ 
++            this.key = sbn.getKey();
+             this.time = Long.toString(sbn.getPostTime());
+             this.app = TextUtils.isEmpty(packageName) ? "Unknown App" : packageName;
+             this.title = this.getPropertySafely(notification, Notification.EXTRA_TITLE);

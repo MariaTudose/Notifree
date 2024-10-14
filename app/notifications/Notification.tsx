@@ -15,7 +15,8 @@ type SubNotification = {
   text: string;
 };
 
-type Notification = {
+export type Notification = {
+  key: string;
   time: string;
   app: string;
   title: string;
@@ -41,7 +42,7 @@ const getIcon = (primary: string, secondary: AppDetail | undefined) => {
   }
 };
 
-export const Notification = ({ app, notifs }: { app: string; notifs: Notification[] }) => {
+export const NotificationItem = ({ app, notifs }: { app: string; notifs: Notification[] }) => {
   const groupByUser = (notifs: Notification[]) => {
     const grouped = notifs.reduce((res: Record<string, Notification[]>, n) => {
       (res[n.title] = res[n.title] || []).push(n);

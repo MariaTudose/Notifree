@@ -4,36 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import { Notification } from './Notification';
+import { NotificationItem, Notification } from './Notification';
 
 import * as S from './styles';
 
 dayjs.extend(relativeTime);
 
 let interval: any = null;
-
-type SubNotification = {
-  title: string;
-  text: string;
-};
-
-type Notification = {
-  time: string;
-  app: string;
-  title: string;
-  titleBig: string;
-  text: string;
-  subText: string;
-  summaryText: string;
-  bigText: string;
-  audioContentsURI: string;
-  imageBackgroundURI: string;
-  extraInfoText: string;
-  icon: string;
-  image: string;
-  iconLarge: string;
-  groupedMessages: SubNotification[];
-};
 
 export default function NotificationView() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -56,8 +33,7 @@ export default function NotificationView() {
   }, []);
 
   const processNotifications = (notifs: Notification[]) => {
-    const filtered = notifs.filter((value, index, self) => index === self.findIndex(t => t.text === value.text));
-    const sorted = filtered.sort((a: Notification, b: Notification) => (a.time < b.time ? 1 : -1));
+    const sorted = notifs.sort((a: Notification, b: Notification) => (a.time < b.time ? 1 : -1));
     const grouped = sorted.reduce((res: Record<string, Notification[]>, n) => {
       (res[n.app] = res[n.app] || []).push(n);
       return res;
@@ -72,7 +48,7 @@ export default function NotificationView() {
           data={Object.entries(processNotifications(notifications))}
           renderItem={({ item }) => {
             const [app, notification] = item;
-            return <Notification app={app} notifs={notification}></Notification>;
+            return <NotificationItem app={app} notifs={notification}></Notification>;
           }}
         />
       </S.NotificationsWrapper>
