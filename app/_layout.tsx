@@ -7,33 +7,9 @@ import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { AppRegistry, View } from 'react-native';
 import { RNAndroidNotificationListenerHeadlessJsName } from 'react-native-android-notification-listener';
-import { Notification } from './notifications/Notification';
+import { headlessNotificationListener } from '@/utils/notificationListener';
 
-const headlessNotificationListener = async ({ notification }: any) => {
-  if (notification) {
-    AsyncStorage.getItem('notifications')
-      .then(res => {
-        if (res) return JSON.parse(res);
-        else return [];
-      })
-      .then(currentNotifs => {
-        let newNotifs = [];
-        const parsedNotif = JSON.parse(notification);
-        const prevNotifIndex = currentNotifs.findIndex((notif: Notification) => notif.key === parsedNotif.key);
-        if (prevNotifIndex > 0) {
-          // If notification with key exists, overwrite it with the new one
-          currentNotifs[prevNotifIndex] = parsedNotif;
-          newNotifs = currentNotifs;
-        } else {
-          // Otherwise add the new notification normally
-          newNotifs = [...currentNotifs, parsedNotif];
-        }
-        AsyncStorage.setItem('notifications', JSON.stringify(newNotifs));
-      })
-      .catch(error => console.log(error));
-  }
-};
-
+// Register notification listener
 AppRegistry.registerHeadlessTask(RNAndroidNotificationListenerHeadlessJsName, () => headlessNotificationListener);
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
