@@ -23,6 +23,7 @@ export default function Index() {
   return (
     <MainContainer>
       <StyledLink href="/notifications">Show notifications</StyledLink>
+      <StyledLink href="/whitelist">Whitelist</StyledLink>
       <StyledLink href="/settings">Settings</StyledLink>
     </MainContainer>
   );

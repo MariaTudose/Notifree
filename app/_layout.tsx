@@ -55,6 +55,13 @@ export default function RootLayout() {
                 headerStyle: { backgroundColor: '#2b2b2b' },
               }}
             />
+            <Stack.Screen
+              name="whitelist"
+              options={{
+                title: 'Whitelist',
+                headerStyle: { backgroundColor: '#2b2b2b' },
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </NativeThemeProvider>
