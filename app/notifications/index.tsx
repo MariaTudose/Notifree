@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ScrollView } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { sortNotifications } from '@/utils/sortNotifications';
 import { Notification } from '@/types/Notification';
 
 import { NotificationItem } from './NotificationItem';
@@ -19,7 +20,7 @@ export default function NotificationView() {
   const handleCheckNotificationInterval = async () => {
     const storedNotifications = await AsyncStorage.getItem('notifications');
     if (storedNotifications) {
-      setNotifications(JSON.parse(storedNotifications));
+      setNotifications(sortNotifications(JSON.parse(storedNotifications)));
     }
   };
 
@@ -33,33 +34,21 @@ export default function NotificationView() {
     };
   }, []);
 
-  const removeNotifs = async (userNotifs: Notification[]) => {
+  const removeNotifs = async (userNotif: Notification) => {
     setNotifications(prevNotifications => {
-      const newNotifs = prevNotifications.filter(notif => {
-        return !userNotifs.find(userNotif => userNotif.key === notif.key);
-      });
+      const newNotifs = prevNotifications.filter(notif => notif.key !== userNotif.key);
       AsyncStorage.setItem('notifications', JSON.stringify(newNotifs));
       return newNotifs;
     });
   };
 
-  const processNotifications = (notifs: Notification[]) => {
-    const sorted = notifs.sort((a: Notification, b: Notification) => (a.time < b.time ? 1 : -1));
-    const grouped = sorted.reduce((res: Record<string, Notification[]>, n) => {
-      (res[n.app] = res[n.app] || []).push(n);
-      return res;
-    }, {});
-    return grouped;
-  };
-
   return (
     <S.MainView>
       <S.NotificationsWrapper>
-        <ScrollView>
-          {Object.entries(processNotifications(notifications)).map(([app, notification]) => {
-            return <NotificationItem key={app} app={app} notifs={notification} removeNotifs={removeNotifs} />;
-          })}
-        </ScrollView>
+        <FlatList
+          data={notifications}
+          renderItem={({ item }) => <NotificationItem app={item.app} notif={item} removeNotifs={removeNotifs} />}
+        />
       </S.NotificationsWrapper>
     </S.MainView>
   );

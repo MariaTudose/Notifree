@@ -12,7 +12,7 @@ export const headlessNotificationListener = async ({ notification }: any) => {
         let newNotifs = [];
         const parsedNotif = JSON.parse(notification);
         const prevNotifIndex = currentNotifs.findIndex((notif: Notification) => notif.key === parsedNotif.key);
-        if (prevNotifIndex > 0) {
+        if (prevNotifIndex >= 0) {
           // If notification with key exists, overwrite it with the new one
           currentNotifs[prevNotifIndex] = parsedNotif;
           newNotifs = currentNotifs;
